@@ -5,7 +5,7 @@ on:
       - qa*
 
 jobs:
-  deploy:
+  deploy-to-qa:
     runs-on: ubuntu-latest
     environment: qa
     steps:
