@@ -1,0 +1,25 @@
+name: JIRA Reference
+on:
+  pull_request:
+jobs:
+  jira:
+    runs-on: ubuntu-latest
+    steps:
+
+      - id: checkout
+        name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: action-jira-linter
+        uses: jira-tools/action-jira-linter@v1.0.1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          jira-token: ${{ secrets.MONITORING_ATLASSIAN_API_TOKEN }}
+          jira-user: ${{ secrets.MONITORING_ATLASSIAN_USER_EMAIL }}
+          jira-base-url: https://sabiogroup.atlassian.net
+          pr-threshold: 1000
+          validate-issue-status: true
+          allowed-issue-statuses: |
+            In Development
+            Development Testing
+          fail-on-error: true
