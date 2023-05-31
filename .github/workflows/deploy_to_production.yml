@@ -7,7 +7,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: production
+    environment: packaged
     steps:
       - id: checkout
         name: Checkout Repository
