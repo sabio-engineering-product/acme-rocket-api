@@ -1,4 +1,4 @@
-name: JIRA Reference
+name: JIRA Reference Staging
 on:
   pull_request:
     branches:

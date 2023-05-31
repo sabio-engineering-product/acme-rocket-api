@@ -2,7 +2,7 @@ name: JIRA Reference QA
 on:
   pull_request:
     branches:
-      - qa*
+    - qa*
 jobs:
   jira:
     runs-on: ubuntu-latest
