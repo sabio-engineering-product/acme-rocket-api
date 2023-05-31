@@ -1,6 +1,8 @@
 name: JIRA Reference
 on:
   pull_request:
+    branches:
+    - develop
 jobs:
   jira:
     runs-on: ubuntu-latest
