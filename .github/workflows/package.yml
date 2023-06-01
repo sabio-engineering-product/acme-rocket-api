@@ -1,0 +1,16 @@
+name: Package
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: packaged
+    steps:
+      - id: checkout
+        name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0

@@ -1,8 +1,8 @@
-name: JIRA Reference Staging
+name: JIRA Reference QA
 on:
   pull_request:
     branches:
-    - develop
+    - main
 jobs:
   jira:
     runs-on: ubuntu-latest
@@ -22,6 +22,7 @@ jobs:
           pr-threshold: 1000
           validate-issue-status: true
           allowed-issue-statuses: |
-            In Development
-            Development Testing
+            Release Testing
+            Quality Review
+            Deployment Authorisation
           fail-on-error: true
