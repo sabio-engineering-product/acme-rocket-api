@@ -22,7 +22,7 @@ jobs:
           pr-threshold: 1000
           validate-issue-status: true
           allowed-issue-statuses: |
-            Release Testing,
-            Quality Review,
-            Deployment Authorisation,
+            Release Testing
+            Quality Review
+            Deployment Authorisation
           fail-on-error: true
