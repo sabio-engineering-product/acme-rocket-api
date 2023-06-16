@@ -61,22 +61,22 @@ jobs:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
-     - name: Manual Input
-       if: github.event_name == 'push'  # Only run on push events
-       id: manual_input
-       uses: actions/github-script@v4
-       with:
-         script: |
-           const response = await github.rest.actions.createOrUpdateWorkflowRunInput({
-             owner: context.repo.owner,
-             repo: context.repo.repo,
-             workflow_id: context.workflow,
-             run_id: context.runId,
-             name: 'proceed',
-             input_id: 'proceed',
-             value: 'false',
-           });
-           console.log('Manual input created:', response.data.html_url);
+      - name: Manual Input
+        if: github.event_name == 'push'  # Only run on push events
+        id: manual_input
+        uses: actions/github-script@v4
+        with:
+          script: |
+            const response = await github.rest.actions.createOrUpdateWorkflowRunInput({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: context.workflow,
+              run_id: context.runId,
+              name: 'proceed',
+              input_id: 'proceed',
+              value: 'false',
+            });
+            console.log('Manual input created:', response.data.html_url);
           
       - name: Wait for Input
         if: steps.manual_input.outputs.proceed == 'true'
