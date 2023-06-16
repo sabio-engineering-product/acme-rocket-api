@@ -1,0 +1,51 @@
+name: 'Snyk Scan Dependencies'
+description: 'Scan dependencies for vulnerabilities.'
+
+inputs:
+  app_type:
+    required: false
+    default: ''
+  snyk_token:
+    required: true
+  severity_threshold:
+    required: false
+    default: medium
+  scan_report_name:
+    required: false
+    default: dependency-scan-report-${{ github.sha }}
+
+runs:
+  using: composite
+  steps:
+  - name: Install Snyk CLI
+    shell: bash
+    run: |
+      curl https://static.snyk.io/cli/latest/snyk-linux -o snyk
+      chmod +x ./snyk
+      sudo mv ./snyk /usr/local/bin/snyk
+  - name: Scan Dependencies for Vulnerabilities
+    if: ${{ ! ((inputs.app_type == 'dotNET') || (inputs.app_type == 'dotnet')) }}
+    shell: bash
+    env:
+      SNYK_TOKEN: ${{ inputs.snyk_token }}
+    run: |
+      snyk test \
+        --severity-threshold="${{ inputs.severity_threshold }}" \
+        --json-file-output="${{ inputs.scan_report_name }}.json" || :
+  - name: Scan dotNET Dependencies for Vulnerabilities
+    if: ${{ (inputs.app_type == 'dotNET') || (inputs.app_type == 'dotnet') }}
+    shell: bash
+    env:
+      SNYK_TOKEN: ${{ inputs.snyk_token }}
+    run: |
+      snyk test \
+        --severity-threshold="${{ inputs.severity_threshold }}" \
+        --json-file-output="${{ inputs.scan_report_name }}.json" \
+        --all-projects \
+        --detection-depth=4 || :
+  - name: Save Vulnerability Report
+    uses: actions/upload-artifact@v3
+    with:
+      name: ${{ inputs.scan_report_name }}
+      path: ${{ inputs.scan_report_name }}.json
+      if-no-files-found: ignore

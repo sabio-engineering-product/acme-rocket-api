@@ -1,0 +1,94 @@
+name: CI Pipeline
+on:
+  push:
+    branches-ignore:
+      - master
+  pull_request:
+  pull_request_review_comment:
+    types: [created]
+
+concurrency:
+    group:
+      ${{ github.repository }}-${{ github.event.number || github.head_ref ||
+      github.sha }}-${{ github.workflow }}-${{ github.event_name ==
+      'pull_request_review_comment' && 'pr_comment' || 'pr' }}
+    cancel-in-progress: ${{ github.event_name != 'pull_request_review_comment' }}
+jobs:
+  standards:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Commit Standards
+        run: echo "Checking Commit Standards"
+      
+      - name: Code Standards
+        run: echo "Checking Lint Standards"
+
+  jira:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Jira
+        run: echo "Checking Jira Ticket Status"
+
+  security:
+    needs: [standards, jira]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Security
+        run: echo "Checking Security"
+  
+  review:
+    needs: [security]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Review
+        run: echo "Generating Open AI Review Content"
+  
+  test:
+    needs: [review]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test
+        run: echo "Running Tests"
+
+  build:
+    needs: [test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build
+        run: echo "Building"
+  
+  deploy-staging:
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Manual Input
+        if: github.event_name == 'push'  # Only run on push events
+        id: manual_input
+        uses: actions/github-script@v4
+        with:
+          script: |
+            const response = await github.rest.actions.createOrUpdateWorkflowRunInput({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: context.workflow,
+              run_id: context.runId,
+              name: 'proceed',
+              input_id: 'proceed',
+              value: 'false',
+            });
+            console.log('Manual input created:', response.data.html_url);
+          
+      - name: Wait for Input
+        if: steps.manual_input.outputs.proceed == 'true'
+        run: echo "Proceeding with the workflow..."
+  
+      - name: Building for Staging
+        run: echo "Building for Staging"
+      
+      - name: Deploying to Staging
+        run: echo "Deployting to Staging"
+  
+
+  
+    
+
