@@ -63,7 +63,7 @@ jobs:
     steps:
       - name: Wait for Input
         id: manual_input
-        uses: actions/github-script
+        uses: actions/github-script@v6.3.0
         with:
           script: |
             const response = await github.rest.actions.createWorkflowDispatch({
