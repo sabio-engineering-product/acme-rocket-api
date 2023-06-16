@@ -64,7 +64,7 @@ jobs:
       - name: Manual Input
         if: github.event_name == 'push'  # Only run on push events
         id: manual_input
-        uses: actions/github-script@v4
+        uses: actions/github-script@v6.3.0
         with:
           script: |
             const response = await github.rest.actions.createOrUpdateWorkflowRunInput({
