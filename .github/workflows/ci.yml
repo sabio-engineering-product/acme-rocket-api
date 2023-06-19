@@ -58,11 +58,11 @@ jobs:
         run: echo "Building"
   
   deploy-staging:
+    if: contains(github.event.pull_request.labels.*.name, 'staging')
     needs: [build]
     runs-on: ubuntu-latest
     steps:      
       - name: Step A
-        if: contains(github.event.pull_request.labels.*.name, 'staging')
         run: echo "Performing Step A"
 
       - name: Step B
