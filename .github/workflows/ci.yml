@@ -67,6 +67,29 @@ jobs:
 
       - name: Step B
         run: echo "Performing Step B"
+
+  deploy-qa:
+    if: contains(github.event.pull_request.labels.*.name, 'quality-assurance')
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:      
+      - name: Step A
+        run: echo "Performing Step A"
+
+      - name: Step B
+        run: echo "Performing Step B"
+
+  qa:
+    if: contains(github.event.pull_request.labels.*.name, 'quality-assurance')
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:      
+      - name: Step A
+        run: echo "Performing Step A"
+
+      - name: Step B
+        run: echo "Performing Step B"
+
   
   
 
