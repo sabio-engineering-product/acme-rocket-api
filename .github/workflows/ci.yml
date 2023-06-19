@@ -60,38 +60,14 @@ jobs:
   deploy-staging:
     needs: [build]
     runs-on: ubuntu-latest
-    steps:
-      - name: Wait for Input
-        id: manual_input
-        uses: actions/github-script@v6.3.0
-        with:
-          script: |
-            const response = await github.rest.actions.createWorkflowDispatch({
-              owner: 'your-username',
-              repo: 'your-repository',
-              workflow_id: 'manual-input-workflow.yml',
-              ref: context.ref
-            });
-            console.log('Manual input requested:', response.data);
+    steps:      
+      - name: Step A
+        if: contains(github.event.pull_request.labels.*.name, 'staging')
+        run: echo "Performing Step A"
 
-      - name: Check for Input Response
-        run: |
-          echo "Waiting for user input..."
-          sleep 10  # Wait for a few seconds before checking for response
-          response=$(curl -s "https://api.github.com/repos/your-username/your-repository/issues?state=open&creator=your-username&labels=manual-input" -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}")
-          if echo "$response" | jq -e '.[0]' > /dev/null; then
-            echo "User input received!"
-            # Perform actions based on the user input
-          else
-            echo "No user input yet..."
-            # Retry or handle the absence of user input
-          fi
+      - name: Step B
+        run: echo "Performing Step B"
   
-      - name: Building for Staging
-        run: echo "Building for Staging"
-      
-      - name: Deploying to Staging
-        run: echo "Deployting to Staging"
   
 
   
