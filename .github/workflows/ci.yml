@@ -1,8 +1,5 @@
 name: CI Pipeline
 on:
-  push:
-    branches-ignore:
-      - master
   pull_request:
   pull_request_review_comment:
     types: [created]
