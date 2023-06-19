@@ -81,7 +81,7 @@ jobs:
 
   qa:
     if: contains(github.event.pull_request.labels.*.name, 'quality-assurance')
-    needs: [build]
+    needs: [deploy-qa]
     runs-on: ubuntu-latest
     steps:      
       - name: Step A
