@@ -70,6 +70,7 @@ jobs:
     if: contains(github.event.pull_request.labels.*.name, 'staging')
     needs: [build]
     runs-on: ubuntu-latest
+    environment: staging
     steps:      
       - name: Step A
         run: echo "Performing Step A"
@@ -81,6 +82,7 @@ jobs:
     if: contains(github.event.pull_request.labels.*.name, 'quality-assurance')
     needs: [build]
     runs-on: ubuntu-latest
+    environment: qa
     steps:      
       - name: Step A
         run: echo "Performing Step A"
@@ -92,6 +94,7 @@ jobs:
     if: contains(github.event.pull_request.labels.*.name, 'quality-assurance')
     needs: [deploy-qa]
     runs-on: ubuntu-latest
+    environment: qa
     steps:      
       - name: Step A
         run: echo "Performing Step A"
