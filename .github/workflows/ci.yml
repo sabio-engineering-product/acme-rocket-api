@@ -53,6 +53,18 @@ jobs:
     steps:
       - name: Build
         run: echo "Building"
+
+  labels:
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR Labels
+        id: check_labels
+        run: |
+          echo "PR Labels:"
+          for label in "${{ github.event.pull_request.labels.*.name }}"; do
+            echo "- $label"
+          done
   
   deploy-staging:
     if: contains(github.event.pull_request.labels.*.name, 'staging')
