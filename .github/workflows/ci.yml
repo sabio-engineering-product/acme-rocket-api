@@ -60,11 +60,11 @@ jobs:
     runs-on: ubuntu-latest
     environment: staging
     steps:      
-      - name: Step A
-        run: echo "Performing Step A"
+      - name: Build Container
+        run: echo "Building Container for staging"
 
-      - name: Step B
-        run: echo "Performing Step B"
+      - name: Deploy Container
+        run: echo "Deploying Container to staging"
 
   deploy-qa:
     if: contains(github.event.pull_request.labels.*.name, 'quality-assurance')
@@ -72,11 +72,11 @@ jobs:
     runs-on: ubuntu-latest
     environment: qa
     steps:      
-      - name: Step A
-        run: echo "Performing Step A"
+      - name: Build Container
+        run: echo "Build Container for QA"
 
-      - name: Step B
-        run: echo "Performing Step B"
+      - name: Deploy Container
+        run: echo "Deploying Container to QA"
 
   qa:
     if: contains(github.event.pull_request.labels.*.name, 'quality-assurance')
