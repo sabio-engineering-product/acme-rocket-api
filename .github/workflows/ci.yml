@@ -20,14 +20,11 @@ jobs:
       - name: Code Standards
         run: echo "Checking Lint Standards"
 
-  jira:
-    runs-on: ubuntu-latest
-    steps:
       - name: Jira
-        run: echo "Checking Jira Ticket Status"
+        run: echo "Checking Jira Ticket Status - Development"
 
   security:
-    needs: [standards, jira]
+    needs: [standards]
     runs-on: ubuntu-latest
     steps:
       - name: Security
@@ -71,7 +68,10 @@ jobs:
     needs: [build]
     runs-on: ubuntu-latest
     environment: qa
-    steps:      
+    steps:
+      - name: Jira
+        run: echo "Checking Jira Ticket Status - QA"
+      
       - name: Build Container
         run: echo "Build Container for QA"
 
@@ -84,11 +84,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: qa
     steps:      
-      - name: Step A
-        run: echo "Performing Step A"
-
-      - name: Step B
-        run: echo "Performing Step B"
+      - name: Check QA Test Status on the ticket.
+        run: echo "Access Execution Status on Tickets"
 
   
   
