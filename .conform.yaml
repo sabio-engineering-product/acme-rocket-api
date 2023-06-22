@@ -13,7 +13,7 @@ policies:
         required: true
       spellcheck:
         locale: GB
-      maximumOfOneCommit: true
+      maximumOfOneCommit: false
       conventional:
         types:
           - chore
