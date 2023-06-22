@@ -13,10 +13,8 @@ concurrency:
 jobs:
   standards:
     uses: sabio-engineering-product/ci-pipeline/.github/workflows/standards.yml@main
-    with:
-      gh-token: ${{ secrets.GITHUB_TOKEN }}
-      monitoring-atlassian-api-token: ${{ secrets.MONITORING_ATLASSIAN_API_TOKEN }}
-      monitoring-atlassian-email: ${{ secrets.MONITORING_ATLASSIAN_EMAIL }}
+    secrets: inherit
+
 
   security:
     needs: [standards]
