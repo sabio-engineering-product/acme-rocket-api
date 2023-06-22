@@ -12,16 +12,7 @@ concurrency:
     cancel-in-progress: ${{ github.event_name != 'pull_request_review_comment' }}
 jobs:
   standards:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Commit Standards
-        run: echo "Checking Commit Standards"
-      
-      - name: Code Standards
-        run: echo "Checking Lint Standards"
-
-      - name: Jira
-        run: echo "Checking Jira Ticket Status - Development"
+    uses: sabio-engineering-product/ci-pipeline/.github/workflows/standards.yml@main
 
   security:
     needs: [standards]
@@ -78,11 +69,10 @@ jobs:
       - name: Deploy Container
         run: echo "Deploying Container to QA"
 
-  qa:
+  qa-testing:
     if: contains(github.event.pull_request.labels.*.name, 'quality-assurance')
     needs: [deploy-qa]
     runs-on: ubuntu-latest
-    environment: qa
     steps:      
       - name: Check QA Test Status on the ticket.
         run: echo "Access Execution Status on Tickets"
