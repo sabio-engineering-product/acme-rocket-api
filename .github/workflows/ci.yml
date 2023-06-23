@@ -36,8 +36,6 @@ jobs:
   deploy-staging:
     if: contains(github.event.pull_request.labels.*.name, 'staging')
     needs: [build]
-    runs-on: ubuntu-latest
-    environment: staging
     uses: sabio-engineering-product/ci-pipeline/.github/workflows/deploy-staging.yml@main
 
   deploy-qa:
