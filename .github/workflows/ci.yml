@@ -24,24 +24,29 @@ jobs:
   review:
     needs: [security]
     uses: sabio-engineering-product/ci-pipeline/.github/workflows/review.yml@main
+    secrets: inherit
   
   test:
     needs: [review]
     uses: sabio-engineering-product/ci-pipeline/.github/workflows/tests.yml@main
+    secrets: inherit
 
   build:
     needs: [test]
     uses: sabio-engineering-product/ci-pipeline/.github/workflows/build.yml@main
+    secrets: inherit
   
   deploy-staging:
     if: contains(github.event.pull_request.labels.*.name, 'staging')
     needs: [build]
     uses: sabio-engineering-product/ci-pipeline/.github/workflows/deploy-staging.yml@main
+    secrets: inherit
 
   deploy-qa:
     if: contains(github.event.pull_request.labels.*.name, 'quality-assurance')
     needs: [build]
     uses: sabio-engineering-product/ci-pipeline/.github/workflows/deploy-qa.yml@main
+    secrets: inherit
 
   qa-testing:
     if: contains(github.event.pull_request.labels.*.name, 'quality-assurance')
