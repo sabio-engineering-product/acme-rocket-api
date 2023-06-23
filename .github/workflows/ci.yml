@@ -23,36 +23,22 @@ jobs:
   
   review:
     needs: [security]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Review
-        run: echo "Generating Open AI Review Content"
+    uses: sabio-engineering-product/ci-pipeline/.github/workflows/review.yml@main
   
   test:
     needs: [review]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Test
-        run: echo "Running Tests"
+    uses: sabio-engineering-product/ci-pipeline/.github/workflows/test.yml@main
 
   build:
     needs: [test]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Build
-        run: echo "Building"
+    uses: sabio-engineering-product/ci-pipeline/.github/workflows/build.yml@main
   
   deploy-staging:
     if: contains(github.event.pull_request.labels.*.name, 'staging')
     needs: [build]
     runs-on: ubuntu-latest
     environment: staging
-    steps:      
-      - name: Build Container
-        run: echo "Building Container for staging"
-
-      - name: Deploy Container
-        run: echo "Deploying Container to staging"
+    uses: sabio-engineering-product/ci-pipeline/.github/workflows/deploy-staging.yml@main
 
   deploy-qa:
     if: contains(github.event.pull_request.labels.*.name, 'quality-assurance')
