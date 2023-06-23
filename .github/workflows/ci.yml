@@ -18,10 +18,8 @@ jobs:
 
   security:
     needs: [standards]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Security
-        run: echo "Checking Security"
+    uses: sabio-engineering-product/ci-pipeline/.github/workflows/security.yml@main
+    secrets: inherit
   
   review:
     needs: [security]
