@@ -41,26 +41,12 @@ jobs:
   deploy-qa:
     if: contains(github.event.pull_request.labels.*.name, 'quality-assurance')
     needs: [build]
-    runs-on: ubuntu-latest
-    environment: qa
-    steps:
-      - name: Jira
-        run: echo "Checking Jira Ticket Status - QA"
-      
-      - name: Build Container
-        run: echo "Build Container for QA"
-
-      - name: Deploy Container
-        run: echo "Deploying Container to QA"
+    uses: sabio-engineering-product/ci-pipeline/.github/workflows/deploy-qa.yml@main
 
   qa-testing:
     if: contains(github.event.pull_request.labels.*.name, 'quality-assurance')
     needs: [deploy-qa]
-    runs-on: ubuntu-latest
-    steps:      
-      - name: Check QA Test Status on the ticket.
-        run: echo "Access Execution Status on Tickets"
-
+    uses: sabio-engineering-product/ci-pipeline/.github/workflows/qa-testing.yml@main
   
   
 
