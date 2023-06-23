@@ -1,22 +1,24 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-RSpec.describe Rocket, type: :model do
-  it "has a valid factory" do
-    expect(FactoryBot.build(:rocket)).to be_valid
+RSpec.describe Rocket do
+  it 'has a valid factory' do
+    expect(build(:rocket)).to be_valid
   end
 
-  it "is invalid without a name" do
-    rocket = FactoryBot.build(:rocket, name: nil)
+  it 'is invalid without a name' do
+    rocket = build(:rocket, name: nil)
     expect(rocket).not_to be_valid
   end
 
-  it "is invalid without a model" do
-    rocket = FactoryBot.build(:rocket, model: nil)
+  it 'is invalid without a model' do
+    rocket = build(:rocket, model: nil)
     expect(rocket).not_to be_valid
   end
 
-  it "is invalid without a manufacturer" do
-    rocket = FactoryBot.build(:rocket, manufacturer: nil)
+  it 'is invalid without a manufacturer' do
+    rocket = build(:rocket, manufacturer: nil)
     expect(rocket).not_to be_valid
   end
 end

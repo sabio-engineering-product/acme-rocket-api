@@ -4,9 +4,7 @@ require 'spec_helper'
 ENV['RAILS_ENV'] ||= 'test'
 require_relative '../config/environment'
 
-if Rails.env.production?
-  abort('The Rails environment is running in production mode!')
-end
+abort('Rails env is in production mode!') if Rails.env.production?
 
 require 'rspec/rails'
 require 'webmock/rspec'
