@@ -27,7 +27,7 @@ jobs:
   
   test:
     needs: [review]
-    uses: sabio-engineering-product/ci-pipeline/.github/workflows/test.yml@main
+    uses: sabio-engineering-product/ci-pipeline/.github/workflows/tests.yml@main
 
   build:
     needs: [test]
