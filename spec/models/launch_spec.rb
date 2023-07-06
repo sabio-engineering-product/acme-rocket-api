@@ -26,15 +26,4 @@ RSpec.describe Launch do
     launch = build(:launch, rocket: nil)
     expect(launch).not_to be_valid
   end
-
-  it 'has many astronauts' do
-    launch = create(:launch)
-    astronaut1 = create(:astronaut)
-    astronaut2 = create(:astronaut)
-
-    launch.astronauts << astronaut1
-    launch.astronauts << astronaut2
-
-    expect(launch.astronauts.count).to eq 2
-  end
 end

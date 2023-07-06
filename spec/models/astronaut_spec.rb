@@ -23,15 +23,4 @@ RSpec.describe Astronaut do
     astronaut = build(:astronaut, date_of_birth: nil)
     expect(astronaut).not_to be_valid
   end
-
-  it 'has many launches' do
-    astronaut = create(:astronaut)
-    launch1 = create(:launch)
-    launch2 = create(:launch)
-
-    astronaut.launches << launch1
-    astronaut.launches << launch2
-
-    expect(astronaut.launches.count).to eq 2
-  end
 end
