@@ -22,12 +22,13 @@ jobs:
     secrets: inherit
   
   review:
+    if: contains(github.event.pull_request.labels.*.name, 'openai')
     needs: [security]
     uses: sabio-engineering-product/ci-pipeline/.github/workflows/review.yml@main
     secrets: inherit
   
   test:
-    needs: [review]
+    needs: [security]
     uses: sabio-engineering-product/ci-pipeline/.github/workflows/tests.yml@main
     with:
       database: true
