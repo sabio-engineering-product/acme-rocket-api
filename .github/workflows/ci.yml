@@ -37,12 +37,22 @@ jobs:
   build:
     needs: [test]
     uses: sabio-engineering-product/ci-pipeline/.github/workflows/build.yml@main
+    with:
+      database: true
+      database_url: 'postgres://postgres@localhost:5432/knowledge_api_test'
+      postgres_db: 'knowledge_api_test'
     secrets: inherit
   
   deploy-staging:
     if: contains(github.event.pull_request.labels.*.name, 'staging')
     needs: [build]
     uses: sabio-engineering-product/ci-pipeline/.github/workflows/deploy-staging.yml@main
+    with:
+      environment: console-staging
+      project_id: 'console-staging-323210'
+      namespace: 'acme-rocket'
+      release_name: 'acme-rocket-api'
+      container-ref: 'gcr.io/console-staging-323210/knowledge-api'
     secrets: inherit
 
   deploy-qa:
