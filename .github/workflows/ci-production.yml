@@ -1,0 +1,46 @@
+name: CI Pipeline
+on:
+  pull_request:
+    branches:
+      - main
+  pull_request_review_comment:
+    types: [created]
+
+concurrency:
+    group:
+      ${{ github.repository }}-${{ github.event.number || github.head_ref ||
+      github.sha }}-${{ github.workflow }}-${{ github.event_name ==
+      'pull_request_review_comment' && 'pr_comment' || 'pr' }}
+    cancel-in-progress: ${{ github.event_name != 'pull_request_review_comment' }}
+jobs:
+  standards:
+    uses: sabio-engineering-product/ci-pipeline/.github/workflows/production-standards.yml@main
+    secrets: inherit
+
+  review:
+    if: contains(github.event.pull_request.labels.*.name, 'openai')
+    needs: [standards]
+    uses: sabio-engineering-product/ci-pipeline/.github/workflows/review.yml@main
+    secrets: inherit
+
+  deploy:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        environment: [beta, uk-production, apac-production]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Deploy to ${{ matrix.environment }}
+        run: |
+          # Add deployment commands specific to each environment
+          echo "Deploying to ${{ matrix.environment }}"
+  
+  
+
+  
+    
+
