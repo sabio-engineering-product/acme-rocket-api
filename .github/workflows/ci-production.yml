@@ -3,8 +3,7 @@ on:
   pull_request:
     branches:
       - main
-  pull_request_review_comment:
-    types: [created]
+    types: [closed]
 
 concurrency:
     group:
@@ -24,6 +23,7 @@ jobs:
     secrets: inherit
 
   deploy:
+    needs: [review]
     runs-on: ubuntu-latest
 
     strategy:
