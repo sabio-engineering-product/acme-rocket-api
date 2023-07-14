@@ -40,6 +40,7 @@ jobs:
     with:
       database_url: 'postgres://postgres@localhost:5432/knowledge_api_test'
       postgres_db: 'knowledge_api_test'
+      release_name: 'acme-rocket-api'
     secrets: inherit
   
   deploy-staging:
