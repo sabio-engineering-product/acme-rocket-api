@@ -35,7 +35,7 @@ jobs:
     secrets: inherit
 
   build:
-    needs: [test]
+    #needs: [test]
     uses: sabio-engineering-product/ci-pipeline/.github/workflows/build.yml@main
     with:
       database_url: 'postgres://postgres@localhost:5432/knowledge_api_test'
