@@ -34,3 +34,4 @@
 
 /.devcontainer/
 /.my.secrets
+/config/database.yml
