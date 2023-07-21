@@ -52,7 +52,7 @@ jobs:
       project_id: 'console-staging-323210'
       namespace: 'acme-rocket'
       release_name: 'acme-rocket-api'
-      container_ref: 'gcr.io/console-staging-323210/knowledge-api'
+      container_ref: 'gcr.io/console-staging-323210/acme-rocket-api'
     secrets: inherit
 
   deploy-qa:
