@@ -1,0 +1,39 @@
+### Ingress
+ingress:
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: knowledge.api.sabio.cloud
+    nginx.ingress.kubernetes.io/cors-allow-origin: https://authmiddleware.sabio.cloud
+  hosts:
+    - host: knowledge.api.sabio.cloud
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls:
+    - secretName: acme-rocket-api-tls
+      hosts:
+        - knowledge.api.sabio.cloud
+
+### Autoscaling
+replicaCount: 2
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+### Resources
+resources:
+  requests:
+    cpu: 500m
+    memory: 256Mi
+  limits:
+    cpu: 1
+    memory: 512Mi
+
+### Environment
+environment:
+  HOST_URL: "https://knowledge.api.sabio.cloud"
+  RAILS_ENV: "production"
+  RACK_ENV: "production"
+  RAILS_LOG_TO_STDOUT: "true"
