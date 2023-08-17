@@ -1,4 +1,0 @@
-deployments:
-  environmentMapping:
-    production:
-      - "packaged"

@@ -1,0 +1,27 @@
+---
+{{- if .Values.metrics.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "acme-rocket-api.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "acme-rocket-api.labels" . | nindent 4 }}
+spec:
+  endpoints:
+    - interval: 30s
+      port: metrics
+      relabelings:
+        - action: replace
+          regex: '.*-(.*)$'
+          replacement: $1
+          sourceLabels:
+            - __meta_kubernetes_pod_name
+          targetLabel: pod_suffix
+  selector:
+    matchLabels:
+      {{- include "acme-rocket-api.selectorLabels" . | nindent 6 }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+{{- end }}

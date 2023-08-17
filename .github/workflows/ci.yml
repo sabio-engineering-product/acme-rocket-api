@@ -1,8 +1,5 @@
 name: CI Pipeline
 on:
-  push:
-    branches-ignore:
-      - master
   pull_request:
   pull_request_review_comment:
     types: [created]
@@ -15,78 +12,60 @@ concurrency:
     cancel-in-progress: ${{ github.event_name != 'pull_request_review_comment' }}
 jobs:
   standards:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Commit Standards
-        run: echo "Checking Commit Standards"
-      
-      - name: Code Standards
-        run: echo "Checking Lint Standards"
+    uses: sabio-engineering-product/ci-pipeline/.github/workflows/standards.yml@main
+    secrets: inherit
 
-  jira:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Jira
-        run: echo "Checking Jira Ticket Status"
 
   security:
-    needs: [standards, jira]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Security
-        run: echo "Checking Security"
+    needs: [standards]
+    uses: sabio-engineering-product/ci-pipeline/.github/workflows/security.yml@main
+    secrets: inherit
   
   review:
+    if: contains(github.event.pull_request.labels.*.name, 'openai')
     needs: [security]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Review
-        run: echo "Generating Open AI Review Content"
+    uses: sabio-engineering-product/ci-pipeline/.github/workflows/review.yml@main
+    secrets: inherit
   
   test:
-    needs: [review]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Test
-        run: echo "Running Tests"
+    needs: [security]
+    uses: sabio-engineering-product/ci-pipeline/.github/workflows/tests.yml@main
+    with:
+      database: true
+    secrets: inherit
 
   build:
     needs: [test]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Build
-        run: echo "Building"
+    uses: sabio-engineering-product/ci-pipeline/.github/workflows/build.yml@main
+    with:
+      database_url: 'postgres://postgres@localhost:5432/knowledge_api_test'
+      postgres_db: 'knowledge_api_test'
+      release_name: 'acme-rocket-api'
+    secrets: inherit
   
   deploy-staging:
+    if: contains(github.event.pull_request.labels.*.name, 'staging')
     needs: [build]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Manual Input
-        if: github.event_name == 'push'  # Only run on push events
-        id: manual_input
-        uses: actions/github-script@v4
-        with:
-          script: |
-            const response = await github.rest.actions.createOrUpdateWorkflowRunInput({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: context.workflow,
-              run_id: context.runId,
-              name: 'proceed',
-              input_id: 'proceed',
-              value: 'false',
-            });
-            console.log('Manual input created:', response.data.html_url);
-          
-      - name: Wait for Input
-        if: steps.manual_input.outputs.proceed == 'true'
-        run: echo "Proceeding with the workflow..."
+    uses: sabio-engineering-product/ci-pipeline/.github/workflows/deploy-staging.yml@main
+    with:
+      environment: console-staging
+      project_id: 'console-staging-323210'
+      namespace: 'acme-rocket'
+      release_name: 'acme-rocket-api'
+      container_ref: 'gcr.io/console-staging-323210/acme-rocket-api'
+    secrets: inherit
+
+  deploy-qa:
+    if: contains(github.event.pull_request.labels.*.name, 'quality-assurance')
+    needs: [build]
+    uses: sabio-engineering-product/ci-pipeline/.github/workflows/deploy-qa.yml@main
+    secrets: inherit
+
+  qa-testing:
+    if: contains(github.event.pull_request.labels.*.name, 'quality-assurance')
+    needs: [deploy-qa]
+    uses: sabio-engineering-product/ci-pipeline/.github/workflows/qa-testing.yml@main
   
-      - name: Building for Staging
-        run: echo "Building for Staging"
-      
-      - name: Deploying to Staging
-        run: echo "Deployting to Staging"
   
 
   

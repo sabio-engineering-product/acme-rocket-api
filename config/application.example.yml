@@ -1,0 +1,16 @@
+APPLICATION_HOST: 'localhost'
+AUTH_LOCAL_SECRET_KEY: 'SecretKey'
+AUTH_PROVIDER_SECRET_KEY: 'AnotherSecretKey'
+BUNDLE_GEM__FURY__IO: ''
+CONSOLE_MANAGER_API_URL: 'https://test.api.cloud'
+DATABASE_PASSWORD: ''
+DVELP_API_AUTH_SECRET_KEY: 'secret'
+PORT: '3000'
+GOOGLE_CREDENTIALS: >
+  {
+    "type": "service_account"
+  }
+GOOGLE_PROJECT_ID: 'some-sandbox-394156'
+PUB_SUB_SYNCHRONISATIONS_TOPIC_NAME: 'knowledge-publish'
+SENTRY_DSN: ''
+SENTRY_ENVIRONMENT: ''

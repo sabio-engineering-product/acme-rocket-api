@@ -1,0 +1,167 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "acme-rocket-api.fullname" . }}
+  labels:
+    {{- include "acme-rocket-api.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "acme-rocket-api.selectorLabels" . | nindent 6 }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "acme-rocket-api.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "acme-rocket-api.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        {{- if .Values.cloudsql.enabled }}
+        - name: cloudsql-proxy
+          image: "{{ .Values.cloudsql.image.repository }}:{{ .Values.cloudsql.image.tag }}"
+          imagePullPolicy: {{ .Values.cloudsql.image.pullPolicy }}
+          volumeMounts:
+          - name: cloudsql
+            mountPath: /cloudsql
+          - name: cloudsql-serviceaccount
+            mountPath: /secret/
+          command:
+          - /cloud_sql_proxy
+          - -credential_file=/secret/account.json
+          - -dir=/cloudsql
+          - -instances={{ .Values.secrets.cloudsql.instance }}
+          resources:
+{{ toYaml .Values.cloudsql.resources | indent 12 }}
+        {{- end }}
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - ./entrypoint.sh
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /heartbeat
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 1
+            failureThreshold: 10
+            successThreshold: 2
+          livenessProbe:
+            httpGet:
+              path: /heartbeat
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 1
+            failureThreshold: 5
+            successThreshold: 1
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            {{- if .Values.cloudsql.enabled }}
+            - name: DATABASE_HOST
+              value: /cloudsql/{{ .Values.secrets.cloudsql.instance }}
+            {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Chart.Name }}-env
+            - secretRef:
+                name: {{ .Chart.Name }}-env
+          {{- if .Values.cloudsql.enabled }}
+          volumeMounts:
+          - name: cloudsql
+            mountPath: /cloudsql
+          - name: cloudsql-serviceaccount
+            mountPath: /secret/
+          {{- end }}
+        - name: prometheus-exporter
+          securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.prometheusExporter.image.repository }}:{{ .Values.prometheusExporter.image.tag }}"
+          imagePullPolicy: "{{ .Values.prometheusExporter.image.pullPolicy }}"
+          command:
+            - ./entrypoint.sh
+            - "{{ .Values.prometheusExporter.appLabel }}"
+            - "{{ .Values.prometheusExporter.metricPrefix }}"
+          ports:
+            - name: metrics
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+            periodSeconds: 10
+            initialDelaySeconds: 5
+            failureThreshold: 3
+            timeoutSeconds: 8
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+            periodSeconds: 10
+            initialDelaySeconds: 5
+            failureThreshold: 5
+            timeoutSeconds: 8
+          envFrom:
+            - configMapRef:
+                name: {{ .Chart.Name }}-env
+            - secretRef:
+                name: {{ .Chart.Name }}-env
+          resources:
+{{ toYaml .Values.prometheusExporter.resources | indent 12 }}
+      volumes:
+        {{- if .Values.cloudsql.enabled }}
+        - name: cloudsql
+          emptyDir: {}
+        - name: cloudsql-serviceaccount
+          secret:
+            secretName: {{ include "acme-rocket-api.fullname" . }}-cloudsql
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  {{- include "acme-rocket-api.selectorLabels" . | nindent 18 }}
+              topologyKey: kubernetes.io/hostname
+            weight: 50
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  {{- include "acme-rocket-api.selectorLabels" . | nindent 18 }}
+              topologyKey: failure-domain.beta.kubernetes.io/zone
+            weight: 100
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

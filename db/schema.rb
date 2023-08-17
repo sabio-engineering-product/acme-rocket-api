@@ -11,6 +11,9 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[7.0].define(version: 2023_06_01_122719) do
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "astronauts", force: :cascade do |t|
     t.string "name"
     t.string "nationality"
@@ -20,15 +23,15 @@ ActiveRecord::Schema[7.0].define(version: 2023_06_01_122719) do
   end
 
   create_table "astronauts_launches", id: false, force: :cascade do |t|
-    t.integer "astronaut_id", null: false
-    t.integer "launch_id", null: false
+    t.bigint "astronaut_id", null: false
+    t.bigint "launch_id", null: false
   end
 
   create_table "launches", force: :cascade do |t|
     t.string "mission_name"
     t.datetime "launch_date"
     t.string "launch_site"
-    t.integer "rocket_id", null: false
+    t.bigint "rocket_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["rocket_id"], name: "index_launches_on_rocket_id"

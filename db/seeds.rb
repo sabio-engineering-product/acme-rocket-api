@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # db/seeds.rb
 
 rockets = [
@@ -13,7 +15,7 @@ rockets.each do |rocket|
   5.times do |i|
     Launch.create(
       mission_name: "#{created_rocket.name} Mission #{i + 1}",
-      launch_date: Time.now + i.months,
+      launch_date: Time.zone.now + i.months,
       launch_site: 'Vandenberg',
       rocket: created_rocket
     )

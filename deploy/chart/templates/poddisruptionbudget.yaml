@@ -1,0 +1,20 @@
+---
+{{ if .Values.podDisruptionBudget.enabled -}}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ template "acme-rocket-api.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "acme-rocket-api.labels" . | nindent 4 }}
+spec:
+  {{ if hasKey .Values.podDisruptionBudget "maxUnavailable" -}}
+  maxUnavailable: {{ .Values.podDisruptionBudget.maxUnavailable }}
+  {{ end -}}
+  {{ if hasKey .Values.podDisruptionBudget "minAvailable" -}}
+  minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
+  {{ end -}}
+  selector:
+    matchLabels:
+      {{- include "acme-rocket-api.selectorLabels" . | nindent 6 }}
+{{- end -}}
