@@ -33,8 +33,15 @@ jobs:
     steps:
     - name: Check out the code
       uses: actions/checkout@v3
+    - name: Bundler Version
+      id: bundler-version
+      shell: bash
+      run: |
+        BUNDLER_VERSION=`grep -A 1 "BUNDLED WITH" Gemfile.lock | tail -n 1 | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+'`
+        echo "Bundler version: ${BUNDLER_VERSION}"
+        echo "version=${BUNDLER_VERSION}" >> ${GITHUB_OUTPUT}
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag localbuild/testimage:latest
+      run: docker build . --file Dockerfile --tag localbuild/testimage:latest --build-arg="BUNDLER_VERSION=${{ steps.bundler-version.outputs.version }}"
     - name: Run the Anchore Grype scan action
       uses: anchore/scan-action@d5aa5b6cb9414b0c7771438046ff5bcfa2854ed7
       id: scan
