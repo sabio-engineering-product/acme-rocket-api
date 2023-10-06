@@ -9,7 +9,7 @@ gem 'bootsnap', require: false
 gem 'pg', '~> 1.1'
 gem 'puma', '~> 5.0'
 gem 'rack-cors', '~> 1.1', '>= 1.1.1'
-gem 'rails', '~> 7.0.5'
+gem 'rails', '~> 7.1.0'
 gem 'sqlite3', '~> 1.4'
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 
@@ -24,7 +24,7 @@ group :test do
   gem 'database_cleaner'
   gem 'factory_bot_rails'
   gem 'faker'
-  gem 'rspec-rails', '~> 5.1.2'
+  gem 'rspec-rails', '~> 6.0.0'
   gem 'rspec-sidekiq'
   gem 'shoulda-matchers'
   gem 'timecop'
