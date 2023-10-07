@@ -14,7 +14,7 @@ gem 'sqlite3', '~> 1.4'
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 
 group :development, :test do
-  gem 'bullet'
+  gem 'bullet', '>= 7.1.0'
   gem 'debug', platforms: %i[mri mingw x64_mingw]
   gem 'rubocop-rails', require: false
   gem 'rubocop-rspec', require: false
