@@ -17,7 +17,7 @@ jobs:
           route: GET /repos/${{ github.repository }}/pulls?state=open
           mediaType: '{"previews": ["squirrel-girl"]}'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.INFRASTRUCTURE_GITHUB_TOKEN }}
         id: get_prs
 
       - name: Iterate and clean labels
@@ -38,4 +38,4 @@ jobs:
             fi
           done
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.INFRASTRUCTURE_GITHUB_TOKEN }}
