@@ -17,25 +17,34 @@ jobs:
           route: GET /repos/${{ github.repository }}/pulls?state=open
           mediaType: '{"previews": ["squirrel-girl"]}'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.INFRASTRUCTURE_GITHUB_TOKEN }}
         id: get_prs
 
       - name: Iterate and clean labels
         run: |
-          PRS=$(echo '${{ steps.get_prs.outputs.data }}' | jq -r '.[] | @base64')
-          for PR in $PRS; do
-            echo $PR | base64 --decode | jq .
-            PR_NUMBER=$(echo $PR | base64 --decode | jq .number)
-            LABELS=$(echo $PR | base64 --decode | jq -r '.labels[] | select(.name | contains("deploy:")) | .name')
-            DO_NOT_DESTROY=$(echo $PR | base64 --decode | jq -r '.labels[] | select(.name == "do-not-destroy") | .name')
-            if [ "$DO_NOT_DESTROY" == "do-not-destroy" ]; then
-              echo "Skipping PR #$PR_NUMBER due to do-not-destroy label."
-            else
-              for LABEL in $LABELS; do
-                echo "Removing label $LABEL from PR #$PR_NUMBER"
-                gh pr edit $PR_NUMBER --remove-label "$LABEL"
-              done
+          PRS_JSON='${{ steps.get_prs.outputs.data }}'
+          PRS=$(echo $PRS_JSON | jq -r '.[] | @base64')
+          PRS_COUNT=$(echo $PRS_JSON | jq -r '. | length')
+          
+          if [ "$PRS_COUNT" -le 0 ]; then
+            echo "No open pull requests to process."
+            exit 0
+          else
+            echo "Found $PRS_COUNT open pull requests."
+            for PR in $PRS; do
+              echo $PR | base64 --decode | jq .
+              PR_NUMBER=$(echo $PR | base64 --decode | jq .number)
+              LABELS=$(echo $PR | base64 --decode | jq -r '.labels[] | select(.name | contains("deploy:")) | .name')
+              DO_NOT_DESTROY=$(echo $PR | base64 --decode | jq -r '.labels[] | select(.name == "do-not-destroy") | .name')
+              if [ "$DO_NOT_DESTROY" == "do-not-destroy" ]; then
+                echo "Skipping PR #$PR_NUMBER due to do-not-destroy label."
+              else
+                for LABEL in $LABELS; do
+                  echo "Removing label $LABEL from PR #$PR_NUMBER"
+                  gh pr edit $PR_NUMBER --remove-label "$LABEL"
+                done
+              fi
             fi
           done
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.INFRASTRUCTURE_GITHUB_TOKEN }}
