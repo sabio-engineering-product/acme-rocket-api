@@ -1,0 +1,41 @@
+name: Shutdown Environments
+
+on:
+  schedule:
+    - cron: '*/5 * * * *' # Runs at 00:00 UTC every day
+
+jobs:
+  remove-labels:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Remove deploy labels from PRs
+        uses: octokit/request-action@v2.x
+        with:
+          route: GET /repos/${{ github.repository }}/pulls?state=open
+          mediaType: '{"previews": ["squirrel-girl"]}'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        id: get_prs
+
+      - name: Iterate and clean labels
+        run: |
+          PRS=$(echo '${{ steps.get_prs.outputs.data }}' | jq -r '.[] | @base64')
+          for PR in $PRS; do
+            echo $PR | base64 --decode | jq .
+            PR_NUMBER=$(echo $PR | base64 --decode | jq .number)
+            LABELS=$(echo $PR | base64 --decode | jq -r '.labels[] | select(.name | contains("deploy:")) | .name')
+            DO_NOT_DESTROY=$(echo $PR | base64 --decode | jq -r '.labels[] | select(.name == "do-not-destroy") | .name')
+            if [ "$DO_NOT_DESTROY" == "do-not-destroy" ]; then
+              echo "Skipping PR #$PR_NUMBER due to do-not-destroy label."
+            else
+              for LABEL in $LABELS; do
+                echo "Removing label $LABEL from PR #$PR_NUMBER"
+                gh pr edit $PR_NUMBER --remove-label "$LABEL"
+              done
+            fi
+          done
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
